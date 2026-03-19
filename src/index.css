@@ -1,0 +1,168 @@
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  height: 100%;
+}
+
+/* Custom header action button (used in accent header rows). */
+.accent-header-action-button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--page-accent);
+  font: inherit;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  border-top-right-radius: var(--mantine-radius-md);
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.accent-header-action-button:hover:not(:disabled) {
+  background-color: var(--page-accent-light);
+}
+
+.accent-header-action-button:active:not(:disabled) {
+  background-color: var(--page-accent-light-bg);
+}
+
+.accent-header-action-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.accent-header-action-button:focus-visible {
+  outline: 2px solid var(--page-accent);
+  outline-offset: -2px;
+}
+
+/* Inline compare-details section (replaces the old modal). */
+.compare-inline-details {
+  margin-top: 0;
+  margin-bottom: calc(var(--mantine-spacing-xl) + var(--mantine-spacing-md));
+  padding-left: var(--mantine-spacing-lg);
+  padding-right: var(--mantine-spacing-lg);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 450ms cubic-bezier(0.2, 0, 0, 1),
+    transform 450ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.compare-inline-details.is-open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.compare-inline-close-button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--mantine-color-dimmed);
+  font: inherit;
+  font-weight: 900;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--mantine-radius-md);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.compare-inline-table-header {
+  padding: 10px 12px;
+  border-top-left-radius: var(--mantine-radius-md);
+  border-top-right-radius: var(--mantine-radius-md);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.compare-inline-close-button:hover {
+  background: var(--mantine-color-gray-1);
+}
+
+.compare-inline-close-button:active {
+  background: var(--mantine-color-gray-2);
+}
+
+.compare-inline-close-button:focus-visible {
+  outline: 2px solid var(--page-accent);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compare-inline-details {
+    transition: none;
+  }
+}
+
+/* Floating title/count used for the label->table-header animation (independent animations). */
+.compare-floating-title-chip,
+.compare-floating-count-chip {
+  position: fixed;
+  z-index: 999;
+  pointer-events: none;
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--mantine-color-dimmed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    left var(--compare-float-ms, 550ms) cubic-bezier(0.2, 0, 0, 1),
+    top var(--compare-float-ms, 550ms) cubic-bezier(0.2, 0, 0, 1),
+    width var(--compare-float-ms, 550ms) cubic-bezier(0.2, 0, 0, 1),
+    height var(--compare-float-ms, 550ms) cubic-bezier(0.2, 0, 0, 1);
+}
+
+.compare-floating-title-chip {
+  text-align: center;
+}
+
+.compare-floating-title-chip.to-header {
+  justify-content: flex-start;
+  text-align: left;
+  color: var(--compare-header-fg, #fff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compare-floating-count-chip {
+  text-align: center;
+  color: var(--mantine-color-dark);
+}
+
+.compare-floating-count-chip.to-header {
+  justify-content: flex-end;
+  text-align: right;
+  color: var(--compare-header-fg, #fff);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compare-floating-title-chip,
+  .compare-floating-count-chip {
+    transition: none;
+  }
+}
