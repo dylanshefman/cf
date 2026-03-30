@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { HashRouter as Router, Navigate, Route, Routes } from 'react-router-dom'
 import { EnforcedLayout } from './layout/EnforcedLayout'
 import { DataBankProvider } from './state/DataBankProvider'
 import { AuthProvider } from './state/AuthProvider'
@@ -9,7 +9,7 @@ import { OperationsPage } from './pages/OperationsPage'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <AuthProvider>
         <DataBankProvider>
           <LoginPrompt />
@@ -25,6 +25,6 @@ export default function App() {
         </Routes>
         </DataBankProvider>
       </AuthProvider>
-    </BrowserRouter>
+    </Router>
   )
 }
