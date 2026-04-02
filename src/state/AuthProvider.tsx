@@ -2,6 +2,10 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { requestJson } from '../utils/api'
 
+const AUTH_STORAGE_KEY = 'app_authed'
+const AUTH_TIMESTAMP_KEY = 'app_authed_at'
+const AUTH_MAX_AGE_MS = 10 * 60 * 1000
+
 type AuthContextType = {
   authenticated: boolean
   loggingIn: boolean
@@ -24,8 +28,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const v = localStorage.getItem('app_authed')
-      if (v === '1') setAuthenticated(true)
+      const authed = localStorage.getItem(AUTH_STORAGE_KEY)
+      const lastLoginAt = Number(localStorage.getItem(AUTH_TIMESTAMP_KEY))
+      const hasValidTimestamp = Number.isFinite(lastLoginAt) && lastLoginAt > 0
+      const loginIsFresh = hasValidTimestamp && Date.now() - lastLoginAt < AUTH_MAX_AGE_MS
+
+      if (authed === '1' && loginIsFresh) {
+        setAuthenticated(true)
+      } else {
+        localStorage.removeItem(AUTH_STORAGE_KEY)
+        localStorage.removeItem(AUTH_TIMESTAMP_KEY)
+      }
     } catch (e) {
       // ignore
     }
@@ -42,7 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (data && data.ok) {
         setAuthenticated(true)
         try {
-          localStorage.setItem('app_authed', '1')
+          localStorage.setItem(AUTH_STORAGE_KEY, '1')
+          localStorage.setItem(AUTH_TIMESTAMP_KEY, String(Date.now()))
         } catch (e) {
           // ignore
         }
@@ -60,7 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   function logout() {
     setAuthenticated(false)
     try {
-      localStorage.removeItem('app_authed')
+      localStorage.removeItem(AUTH_STORAGE_KEY)
+      localStorage.removeItem(AUTH_TIMESTAMP_KEY)
     } catch (e) {
       // ignore
     }

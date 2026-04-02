@@ -16,7 +16,7 @@ body {
   appearance: none;
   border: 0;
   background: transparent;
-  color: var(--page-accent);
+  color: #fff;
   font: inherit;
   font-weight: 800;
   font-size: 13px;
@@ -28,6 +28,7 @@ body {
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
+  transition: background-color 160ms ease, transform 160ms ease;
 
   border-top-right-radius: var(--mantine-radius-md);
   border-bottom-right-radius: 0;
@@ -36,20 +37,22 @@ body {
 }
 
 .accent-header-action-button:hover:not(:disabled) {
-  background-color: var(--page-accent-light);
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
 }
 
 .accent-header-action-button:active:not(:disabled) {
-  background-color: var(--page-accent-light-bg);
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(0);
 }
 
 .accent-header-action-button:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .accent-header-action-button:focus-visible {
-  outline: 2px solid var(--page-accent);
+  outline: 2px solid rgba(255, 255, 255, 0.95);
   outline-offset: -2px;
 }
 
