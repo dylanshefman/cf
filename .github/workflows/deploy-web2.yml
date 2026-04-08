@@ -3,10 +3,13 @@ name: Deploy web2 to GitHub Pages
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       VITE_CF_API_BASE_URL: https://cf-phi-three.vercel.app
     steps:
