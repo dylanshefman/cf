@@ -3,7 +3,7 @@ import type { StandardTableKey } from './dataBank'
 export type OperationId =
   | 'add_tenants'
   | 'add_levels'
-  | 'add_sections'
+  | 'add_space_units'
   | 'assign_tenant_to_space'
   | 'assign_meter_to_space'
 
@@ -40,8 +40,8 @@ export const OPERATIONS: OperationSpec[] = [
     requiredTables: withAlwaysRequired(['cf.floor']),
   },
   {
-    id: 'add_sections',
-    label: 'Add sections',
+    id: 'add_space_units',
+    label: 'Add space units',
     requiredTables: withAlwaysRequired(['cf.unit']),
   },
   {

@@ -85,8 +85,7 @@ async function doFetch(buildingId: string, uploadKey: string, opts: { force: boo
   const existing = getSnapshot(key)
   setSnapshot(key, { ...existing, loading: true, error: '' })
 
-  // Note: `spaceCategory` is ignored by the backend now, but keep it for compatibility.
-  const url = `/api/meter_assignments?buildingId=${encodeURIComponent(normalizedId)}&autoPage=1&limit=200&spaceCategory=Section`
+  const url = `/api/meter_assignments?buildingId=${encodeURIComponent(normalizedId)}&autoPage=1&limit=200`
 
   try {
     const payload = await getJson<unknown>(url)

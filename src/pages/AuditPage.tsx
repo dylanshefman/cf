@@ -128,7 +128,11 @@ function getSpaceIdentifier(raw: any): string {
 }
 
 function getPartOfId(raw: any): string {
-  const id = raw?.partOf?.id ?? raw?.partOf?._id
+  const id =
+    raw?.partOf?.id ??
+    raw?.partOf?._id ??
+    raw?.partOfId ??
+    raw?.parentSpaceId
   return id ? String(id).trim() : ''
 }
 
@@ -264,7 +268,7 @@ export function AuditPage() {
     error: unitsError,
     ready: unitsReady,
     refresh: refreshUnits,
-  } = useSpacesByBuildingIdCategory(selectedBuildingId, 'Section', spacesEnabled)
+  } = useSpacesByBuildingIdCategory(selectedBuildingId, 'SpaceUnit', spacesEnabled)
 
   const {
     data: assignmentsRaw,
@@ -534,7 +538,7 @@ export function AuditPage() {
         identifier,
         unitCode,
         meter: { identifier },
-        space: { identifier: unitCode, name: unitCode, category: 'Section' },
+        space: { identifier: unitCode, name: unitCode, category: 'SpaceUnit' },
         raw: row,
       })
     }
@@ -554,7 +558,7 @@ export function AuditPage() {
         _id: spaceId,
         identifier: unitCode,
         name: unitCode,
-        category: 'Section',
+        category: 'SpaceUnit',
       }
 
       const identifier = normalizeKey(meter?.identifier)
@@ -663,22 +667,8 @@ export function AuditPage() {
         key: 'type',
         label: 'Type',
         getUploaded: (row: any) => row?.UNIT_TYPE,
-        getApi: (row: any) => row?.description,
+        getApi: (row: any) => row?.type,
         normalize: normalizeKey,
-      },
-      {
-        key: 'operationalStatus',
-        label: 'Operational status',
-        getUploaded: () => 'active',
-        getApi: (row: any) => row?.operationalStatus,
-        normalize: normalizeStatus,
-      },
-      {
-        key: 'tenancyStatus',
-        label: 'Tenancy status',
-        getUploaded: () => 'available',
-        getApi: (row: any) => row?.tenancyStatus,
-        normalize: normalizeStatus,
       },
     ],
     [levelIdentifierById],
@@ -856,20 +846,21 @@ export function AuditPage() {
           const sqft = parseNumber((uploadedRow as any)?.UNIT_SQFT)
           const unitType = normalizeCode((uploadedRow as any)?.UNIT_TYPE)
 
-          const section: any = {
+          const spaceUnit: any = {
             identifier,
             name: identifier,
-            description: unitType,
-            partOf: { id: floorId },
-            operationalStatus: 'active',
-            tenancyStatus: 'available',
+            category: 'SpaceUnit',
+            parentSpaceId: floorId,
+            type: unitType,
+            tenantUnit: true,
+            leasable: true,
           }
 
-          if (sqft !== null) section.area = { value: sqft, unit: 'ft2' }
+          if (sqft !== null) spaceUnit.area = { value: sqft, unit: 'ft2' }
 
           await requestJson(`/api/space_sections?buildingId=${encBuildingId}`, {
             method: 'POST',
-            body: { sections: [section] },
+            body: { spaceUnits: [spaceUnit] },
           })
         },
       },
@@ -896,10 +887,11 @@ export function AuditPage() {
           const payload: any = {
             identifier,
             name: identifier,
-            description: unitType,
-            partOf: { id: floorId },
-            operationalStatus: 'active',
-            tenancyStatus: 'available',
+            category: 'SpaceUnit',
+            parentSpaceId: floorId,
+            type: unitType,
+            tenantUnit: true,
+            leasable: true,
           }
 
           if (sqft !== null) {

@@ -82,7 +82,7 @@ async function doFetch(buildingId: string, opts: { force: boolean }): Promise<vo
 
   // autoPage=1 relies on serverless/cf/api/api/space_assignments.py forwarding auto_page
   // to KodeSession.list_space_assignments(auto_page=True).
-  const url = `/api/space_assignments?buildingId=${encodeURIComponent(normalizedId)}&autoPage=1&limit=200`
+  const url = `/api/space_assignments?buildingId=${encodeURIComponent(normalizedId)}&autoPage=1&limit=50`
 
   try {
     const payload = await getJson<unknown>(url)
