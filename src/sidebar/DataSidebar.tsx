@@ -8,11 +8,13 @@ import {
   Text,
   UnstyledButton,
 } from '@mantine/core'
-import { IconChevronDown, IconChevronRight, IconTable } from '@tabler/icons-react'
+import { notifications } from '@mantine/notifications'
+import { IconChevronDown, IconChevronRight, IconDownload, IconTable } from '@tabler/icons-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { CARMA_TABLES, CF_TABLES, type StandardTableKey } from '../state/dataBank'
 import { useDataBank } from '../state/dataBankContext'
+import { exportAllTablesAsXlsx, exportTableAsCsv } from '../utils/tableExport'
 
 function firstAvailableTableKey(bank: ReturnType<typeof useDataBank>['bank']): StandardTableKey | undefined {
   for (const t of CF_TABLES) {
@@ -75,6 +77,8 @@ export function DataSidebar() {
 
   const tableButton = (t: { key: StandardTableKey; hasData: boolean; rows: number }) => {
     const isSelected = selected === t.key
+    const [category, tableName] = t.key.split('.') as ['cf' | 'carma', string]
+    const data = category === 'cf' ? bank.cf[tableName as (typeof CF_TABLES)[number]] : bank.carma[tableName as (typeof CARMA_TABLES)[number]]
 
     return (
       <UnstyledButton
@@ -100,13 +104,57 @@ export function DataSidebar() {
           </Group>
 
           {t.hasData ? (
-            <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
-              {t.rows.toLocaleString()}
-            </Text>
+            <Group gap={6} wrap="nowrap" style={{ whiteSpace: 'nowrap' }}>
+              <Text size="xs" c="dimmed">
+                {t.rows.toLocaleString()}
+              </Text>
+
+              <ActionIcon
+                component="span"
+                variant="subtle"
+                aria-label={`Export ${t.key.split('.')[1]} as CSV`}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  if (!data) return
+                  exportTableAsCsv(t.key, data)
+                }}
+              >
+                <IconDownload size={16} />
+              </ActionIcon>
+            </Group>
           ) : null}
         </Group>
       </UnstyledButton>
     )
+  }
+
+  const allTablesForExport = useMemo(() => {
+    const cf = CF_TABLES.flatMap((tableName) => {
+      const data = bank.cf[tableName]
+      return data ? [{ key: `cf.${tableName}` as const, data }] : []
+    })
+    const carma = CARMA_TABLES.flatMap((tableName) => {
+      const data = bank.carma[tableName]
+      return data ? [{ key: `carma.${tableName}` as const, data }] : []
+    })
+    return [...cf, ...carma]
+  }, [bank.cf, bank.carma])
+
+  const exportAll = () => {
+    if (!allTablesForExport.length) {
+      notifications.show({
+        color: 'yellow',
+        title: 'No data to export',
+        message: 'Upload at least one table first.',
+      })
+      return
+    }
+    exportAllTablesAsXlsx(allTablesForExport)
   }
 
   const section = (label: 'cf' | 'carma', open: boolean, rows: Array<{ key: StandardTableKey; hasData: boolean; rows: number }>) => (
@@ -135,7 +183,17 @@ export function DataSidebar() {
 
   return (
     <Stack gap="sm">
-      <Text fw={900}>Tables</Text>
+      <Group justify="space-between" wrap="nowrap">
+        <Text fw={900}>Tables</Text>
+        <ActionIcon
+          variant="subtle"
+          aria-label="Export all tables as XLSX"
+          disabled={!allTablesForExport.length}
+          onClick={exportAll}
+        >
+          <IconDownload size={16} />
+        </ActionIcon>
+      </Group>
       {section('cf', expanded.has('cf'), cfTables)}
       <Divider />
       {section('carma', expanded.has('carma'), carmaTables)}
