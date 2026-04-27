@@ -198,18 +198,6 @@ export function AuditPage() {
     return new Set(Object.keys(buildingsBySiteCode))
   }, [buildingsBySiteCode])
 
-  
-
-  if (!propertyTable) {
-    return (
-      <Box style={{ minHeight: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Text c="dimmed" size="sm">
-          No property table uploaded. Upload the property table to use Audit.
-        </Text>
-      </Box>
-    )
-  }
-
   const selectedCode = normalizeCode(searchParams.get('property'))
   const selectedProperty = selectedCode ? properties.find((p) => p.code === selectedCode) ?? null : null
 
@@ -1331,6 +1319,16 @@ export function AuditPage() {
       meterSpaceCreateCandidates.length +
       meterSpaceDeleteCandidates.length ===
     0
+
+  if (!propertyTable) {
+    return (
+      <Box style={{ minHeight: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Text c="dimmed" size="sm">
+          No property table uploaded. Upload the property table to use Audit.
+        </Text>
+      </Box>
+    )
+  }
 
   return (
     <>

@@ -147,19 +147,28 @@ export function CompareStackedBar({
   useEffect(() => {
     if (!containerEl) return
 
+    const target = containerEl.parentElement ?? containerEl
+    let rafId = 0
+
     const ro = new ResizeObserver((entries) => {
       const w = entries[0]?.contentRect?.width ?? 0
       const nextWidth = Math.max(0, Math.floor(w))
 
-      setContainerWidth((prev) => {
-        if (prev === nextWidth) return prev
-        return nextWidth
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => {
+        setContainerWidth((prev) => {
+          if (prev === nextWidth) return prev
+          return nextWidth
+        })
       })
     })
 
-    ro.observe(containerEl)
+    ro.observe(target)
 
-    return () => ro.disconnect()
+    return () => {
+      cancelAnimationFrame(rafId)
+      ro.disconnect()
+    }
   }, [containerEl])
 
   useEffect(() => {
