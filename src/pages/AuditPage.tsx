@@ -117,29 +117,16 @@ function normalizeArea(value: unknown): string {
   return `${canonicalNumber(num)}|${u}`
 }
 
-type AreaUnitKey = 'ft2' | 'm2'
-
-const AREA_UNIT_BY_KEY: Record<AreaUnitKey, { _id: string; symbol: string }> = {
-  ft2: {
-    _id: 'square_feet',
-    symbol: 'ft\u00b2',
-  },
-  m2: {
-    _id: 'square_meters',
-    symbol: 'm\u00b2',
-  },
-}
-
-function getAreaUnitKey(value: unknown): AreaUnitKey {
+function getAreaUnit(value: unknown): string {
   const normalized = normalizeArea(value)
   const unit = normalized.split('|')[1] ?? ''
-  return unit.includes('m\u00b2') || unit === 'm2' ? 'm2' : 'ft2'
+  return unit || 'ft\u00b2'
 }
 
-function buildAreaPayload(value: number, unitKey: AreaUnitKey): { unit: { _id: string; symbol: string }; value: number } {
+function buildAreaPayload(value: number, unit: string): { value: number; unit: string } {
   return {
-    unit: AREA_UNIT_BY_KEY[unitKey],
     value,
+    unit,
   }
 }
 
@@ -672,7 +659,7 @@ export function AuditPage() {
         getUploaded: (row: any) => {
           const sqft = parseNumber(row?.UNIT_SQFT)
           if (sqft === null) return null
-          return buildAreaPayload(sqft, 'ft2')
+          return buildAreaPayload(sqft, 'ft\u00b2')
         },
         getApi: (row: any) => row?.area,
         normalize: normalizeArea,
@@ -872,7 +859,7 @@ export function AuditPage() {
             leasable: true,
           }
 
-          if (sqft !== null) spaceUnit.area = buildAreaPayload(sqft, 'ft2')
+          if (sqft !== null) spaceUnit.area = buildAreaPayload(sqft, 'ft\u00b2')
 
           await requestJson(`/api/spaces?buildingId=${encBuildingId}`, {
             method: 'POST',
@@ -911,7 +898,7 @@ export function AuditPage() {
           }
 
           if (sqft !== null) {
-            payload.area = buildAreaPayload(sqft, getAreaUnitKey((apiRow as any)?.area))
+            payload.area = buildAreaPayload(sqft, getAreaUnit((apiRow as any)?.area))
           }
 
           await requestJson(`/api/space?buildingId=${encBuildingId}&spaceId=${encodeURIComponent(apiMutationId)}`, {
