@@ -67,7 +67,7 @@ function normalizeArea(value: unknown): string {
     if (!s) return ''
     const cleaned = s.replace('²', '2').replace('^2', '2')
     if (cleaned === 'ft2' || cleaned === 'sqft' || cleaned === 'sq ft' || cleaned === 'square_feet' || cleaned === 'square feet') {
-      return 'ft\\u00b2'
+      return 'ft\u00b2'
     }
     if (cleaned === 'm2' || cleaned === 'sqm' || cleaned === 'sq m' || cleaned === 'square_meter' || cleaned === 'square meter') {
       return 'm2'
@@ -113,7 +113,7 @@ function normalizeArea(value: unknown): string {
 
   const { num, unit } = toAreaParts(value)
   if (num === null) return ''
-  const u = unit || 'ft\\u00b2'
+  const u = unit || 'ft\u00b2'
   return `${canonicalNumber(num)}|${u}`
 }
 
@@ -122,11 +122,11 @@ type AreaUnitKey = 'ft2' | 'm2'
 const AREA_UNIT_BY_KEY: Record<AreaUnitKey, { _id: string; symbol: string }> = {
   ft2: {
     _id: 'square_feet',
-    symbol: 'ft\\u00b2',
+    symbol: 'ft\u00b2',
   },
   m2: {
     _id: 'square_meters',
-    symbol: 'm\\u00b2',
+    symbol: 'm\u00b2',
   },
 }
 
