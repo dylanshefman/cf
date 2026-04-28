@@ -886,7 +886,7 @@ export function AuditPage() {
 
           if (sqft !== null) {
             const existingUnit = (apiRow as any)?.area?.unit
-            payload.area = existingUnit ? { value: sqft, unit: existingUnit } : { value: sqft, unit: 'ft2' }
+            payload.area = existingUnit ? { value: sqft, unit: existingUnit } : { value: sqft, unit: 'ft\u00b2' }
           }
 
           await requestJson(`/api/space?buildingId=${encBuildingId}&spaceId=${encodeURIComponent(apiMutationId)}`, {
