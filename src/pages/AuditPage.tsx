@@ -808,10 +808,12 @@ export function AuditPage() {
         run: async (c: CreateCandidate<any>) => {
           const identifier = c.identifier
           const name = normalizeCode((c.uploadedRow as any)?.FLOOR_DESCRIPTION) || identifier
-          await requestJson(`/api/space_levels?buildingId=${encBuildingId}`, {
+          await requestJson(`/api/spaces?buildingId=${encBuildingId}`, {
             method: 'POST',
             body: {
-              levels: [{ identifier, name }],
+              identifier,
+              name,
+              category: 'Level',
             },
           })
         },
@@ -846,9 +848,9 @@ export function AuditPage() {
 
           if (sqft !== null) spaceUnit.area = { value: sqft, unit: 'ft2' }
 
-          await requestJson(`/api/space_sections?buildingId=${encBuildingId}`, {
+          await requestJson(`/api/spaces?buildingId=${encBuildingId}`, {
             method: 'POST',
-            body: { spaceUnits: [spaceUnit] },
+            body: spaceUnit,
           })
         },
       },
