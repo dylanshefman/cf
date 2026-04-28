@@ -67,7 +67,7 @@ function normalizeArea(value: unknown): string {
     if (!s) return ''
     const cleaned = s.replace('²', '2').replace('^2', '2')
     if (cleaned === 'ft2' || cleaned === 'sqft' || cleaned === 'sq ft' || cleaned === 'square_feet' || cleaned === 'square feet') {
-      return 'ft\u00b2'
+      return 'ft\\u00b2'
     }
     if (cleaned === 'm2' || cleaned === 'sqm' || cleaned === 'sq m' || cleaned === 'square_meter' || cleaned === 'square meter') {
       return 'm2'
@@ -113,7 +113,7 @@ function normalizeArea(value: unknown): string {
 
   const { num, unit } = toAreaParts(value)
   if (num === null) return ''
-  const u = unit || 'ft\u00b2'
+  const u = unit || 'ft\\u00b2'
   return `${canonicalNumber(num)}|${u}`
 }
 
@@ -646,7 +646,7 @@ export function AuditPage() {
         getUploaded: (row: any) => {
           const sqft = parseNumber(row?.UNIT_SQFT)
           if (sqft === null) return null
-          return { value: sqft, unit: 'ft\u00b2' }
+          return { value: sqft, unit: 'ft\\u00b2' }
         },
         getApi: (row: any) => row?.area,
         normalize: normalizeArea,
@@ -846,7 +846,7 @@ export function AuditPage() {
             leasable: true,
           }
 
-          if (sqft !== null) spaceUnit.area = { value: sqft, unit: 'ft\u00b2' }
+          if (sqft !== null) spaceUnit.area = { value: sqft, unit: 'ft\\u00b2' }
 
           await requestJson(`/api/spaces?buildingId=${encBuildingId}`, {
             method: 'POST',
@@ -886,7 +886,7 @@ export function AuditPage() {
 
           if (sqft !== null) {
             const existingUnit = (apiRow as any)?.area?.unit
-            payload.area = existingUnit ? { value: sqft, unit: existingUnit } : { value: sqft, unit: 'ft\u00b2' }
+            payload.area = existingUnit ? { value: sqft, unit: existingUnit } : { value: sqft, unit: 'ft\\u00b2' }
           }
 
           await requestJson(`/api/space?buildingId=${encBuildingId}&spaceId=${encodeURIComponent(apiMutationId)}`, {
