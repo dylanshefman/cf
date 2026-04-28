@@ -117,6 +117,32 @@ function normalizeArea(value: unknown): string {
   return `${canonicalNumber(num)}|${u}`
 }
 
+type AreaUnitKey = 'ft2' | 'm2'
+
+const AREA_UNIT_BY_KEY: Record<AreaUnitKey, { _id: string; symbol: string }> = {
+  ft2: {
+    _id: 'square_feet',
+    symbol: 'ft\\u00b2',
+  },
+  m2: {
+    _id: 'square_meters',
+    symbol: 'm\\u00b2',
+  },
+}
+
+function getAreaUnitKey(value: unknown): AreaUnitKey {
+  const normalized = normalizeArea(value)
+  const unit = normalized.split('|')[1] ?? ''
+  return unit.includes('m\u00b2') || unit === 'm2' ? 'm2' : 'ft2'
+}
+
+function buildAreaPayload(value: number, unitKey: AreaUnitKey): { unit: { _id: string; symbol: string }; value: number } {
+  return {
+    unit: AREA_UNIT_BY_KEY[unitKey],
+    value,
+  }
+}
+
 function getSpaceId(raw: any): string {
   const id = raw?._id ?? raw?.id ?? raw?.spaceId
   return id ? String(id).trim() : ''
@@ -646,7 +672,7 @@ export function AuditPage() {
         getUploaded: (row: any) => {
           const sqft = parseNumber(row?.UNIT_SQFT)
           if (sqft === null) return null
-          return { value: sqft, unit: 'ft\\u00b2' }
+          return buildAreaPayload(sqft, 'ft2')
         },
         getApi: (row: any) => row?.area,
         normalize: normalizeArea,
@@ -846,7 +872,7 @@ export function AuditPage() {
             leasable: true,
           }
 
-          if (sqft !== null) spaceUnit.area = { value: sqft, unit: 'ft\\u00b2' }
+          if (sqft !== null) spaceUnit.area = buildAreaPayload(sqft, 'ft2')
 
           await requestJson(`/api/spaces?buildingId=${encBuildingId}`, {
             method: 'POST',
@@ -885,8 +911,7 @@ export function AuditPage() {
           }
 
           if (sqft !== null) {
-            const existingUnit = (apiRow as any)?.area?.unit
-            payload.area = existingUnit ? { value: sqft, unit: existingUnit } : { value: sqft, unit: 'ft\\u00b2' }
+            payload.area = buildAreaPayload(sqft, getAreaUnitKey((apiRow as any)?.area))
           }
 
           await requestJson(`/api/space?buildingId=${encBuildingId}&spaceId=${encodeURIComponent(apiMutationId)}`, {
